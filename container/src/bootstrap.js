@@ -8,7 +8,10 @@ const Analytics = React.lazy(() => import("mfeAnalytics/Analytics"));
 
 function App() {
   useEffect(() => {
-    import("http://localhost:3003/profile.js");
+    const script = document.createElement('script');
+    script.src = 'http://localhost:3003/profile.js';
+    script.type = 'text/javascript';
+    document.head.appendChild(script);
   }, []);
 
   return (
