@@ -1,0 +1,47 @@
+{
+  "version": "1.0",
+  "mfeDataAccess": {
+    "mfe-profile": {
+      "readable": ["name", "DOB"],
+      "writable": ["name", "DOB"],
+      "description": "Profile MFE can read and update name and date of birth"
+    },
+    "mfe-reports": {
+      "readable": ["state", "name"],
+      "writable": ["state"],
+      "description": "Reports MFE can read name and state, but only update state"
+    },
+    "mfe-analytics": {
+      "readable": ["name", "state", "DOB"],
+      "writable": [],
+      "description": "Analytics MFE can read all data but cannot modify anything"
+    },
+    "mfe-home": {
+      "readable": ["name"],
+      "writable": [],
+      "description": "Home MFE only displays user name"
+    }
+  },
+  "dataValidation": {
+    "name": {
+      "type": "string",
+      "maxLength": 100,
+      "required": true
+    },
+    "DOB": {
+      "type": "string",
+      "pattern": "^\\d{1,2} \\w+$",
+      "required": false
+    },
+    "state": {
+      "type": "string",
+      "enum": ["Minnesota", "California", "Texas", "New York", "Florida", "Illinois"],
+      "required": false
+    }
+  },
+  "defaultData": {
+    "name": "Guest User",
+    "DOB": null,
+    "state": null
+  }
+}

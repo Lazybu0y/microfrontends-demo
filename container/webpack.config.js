@@ -15,7 +15,10 @@ module.exports = {
       {
         test: /\.jsx?$/,
         loader: "babel-loader",
-        exclude: /node_modules\/(?!@acme\/mfe-reports)/,
+        exclude: /node_modules(?!\/@acme\/mfe-reports)/,
+        options: {
+          presets: ["@babel/preset-env", "@babel/preset-react"],
+        },
       },
     ],
   },
@@ -25,6 +28,7 @@ module.exports = {
       remotes: {
         mfeHome: "mfeHome@http://localhost:3001/remoteEntry.js",
         mfeAnalytics: "mfeAnalytics@http://localhost:3002/remoteEntry.js",
+        mfeDataBus: "mfeDataBus@http://localhost:3004/remoteEntry.js",
       },
       shared: ["react", "react-dom"],
     }),

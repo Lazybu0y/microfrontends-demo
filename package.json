@@ -5,7 +5,8 @@
     "container",
     "mfe-home",
     "mfe-analytics",
-    "mfe-reports"
+    "mfe-reports",
+    "mfe-data-bus"
   ],
   "scripts": {
     "start:container": "npm --workspace container start",
@@ -13,7 +14,8 @@
     "start:analytics": "npm --workspace mfe-analytics start",
     "start:reports": "npm --workspace mfe-reports run build",
     "start:profile": "npx http-server mfe-profile -p 3003 -c-1",
-    "start:all": "concurrently \"npm run start:container\" \"npm run start:home\" \"npm run start:analytics\" \"npm run start:profile\" \"npm run start:reports\""
+    "start:data-bus": "npm --workspace mfe-data-bus start",
+    "start:all": "concurrently \"npm run start:container\" \"npm run start:home\" \"npm run start:analytics\" \"npm run start:profile\" \"npm run start:data-bus\" \"npm run start:reports\""
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
