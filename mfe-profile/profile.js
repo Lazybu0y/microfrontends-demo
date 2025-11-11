@@ -1,32 +1,59 @@
 class ProfileCard extends HTMLElement {
     constructor() {
         super();
-        this.dataBus = null;
+        this.dataBusAPI = null;
         this.profileData = {};
     }
 
     async connectedCallback() {
         try {
-            // Import DataBus from the federated module
-            const DataBusModule = await import('http://localhost:3004/remoteEntry.js');
-            await DataBusModule.get('./DataBus')().then(module => {
-                this.dataBus = module.default;
-            });
+            // Wait for DataBus API to be ready
+            if (window.DataBusAPI && window.DataBusAPI.isDataBusReady()) {
+                this.initializeWithDataBus();
+            } else {
+                // Listen for databus-ready event
+                window.addEventListener('databus-ready', () => {
+                    this.initializeWithDataBus();
+                });
+                
+                // Also check periodically in case event was missed
+                let attempts = 0;
+                const checkDataBus = () => {
+                    if (window.DataBusAPI && window.DataBusAPI.isDataBusReady()) {
+                        this.initializeWithDataBus();
+                    } else if (attempts < 50) { // Wait up to 5 seconds
+                        attempts++;
+                        setTimeout(checkDataBus, 100);
+                    } else {
+                        console.warn('mfe-profile: DataBus not available, using fallback');
+                        this.renderFallback();
+                    }
+                };
+                checkDataBus();
+            }
+        } catch (error) {
+            console.error('mfe-profile: Failed to connect to DataBus:', error);
+            this.renderFallback();
+        }
+    }
+
+    initializeWithDataBus() {
+        try {
+            this.dataBusAPI = window.DataBusAPI;
 
             // Subscribe to profile data changes
-            this.dataBus.subscribe('mfe-profile', (data) => {
+            this.dataBusAPI.subscribeToProfileData((data) => {
                 this.profileData = data;
                 this.render();
             });
 
             // Get initial data
-            this.profileData = this.dataBus.getProfileData();
+            this.profileData = this.dataBusAPI.getProfileData();
             this.render();
 
-            console.log('mfe-profile: Connected to DataBus');
+            console.log('mfe-profile: Connected to Container DataBus API');
         } catch (error) {
-            console.error('mfe-profile: Failed to connect to DataBus:', error);
-            // Fallback to attribute-based rendering
+            console.error('mfe-profile: Failed to initialize with DataBus:', error);
             this.renderFallback();
         }
     }
@@ -66,20 +93,20 @@ class ProfileCard extends HTMLElement {
     }
 
     updateName() {
-        if (this.dataBus) {
+        if (this.dataBusAPI) {
             const newName = this.querySelector('#nameInput').value;
             if (newName.trim()) {
-                this.dataBus.updateProfileData({ name: newName });
+                this.dataBusAPI.updateProfileData({ name: newName });
                 console.log('mfe-profile: Updated name to:', newName);
             }
         }
     }
 
     updateDOB() {
-        if (this.dataBus) {
+        if (this.dataBusAPI) {
             const newDOB = this.querySelector('#dobInput').value;
             if (newDOB.trim()) {
-                this.dataBus.updateProfileData({ DOB: newDOB });
+                this.dataBusAPI.updateProfileData({ DOB: newDOB });
                 console.log('mfe-profile: Updated DOB to:', newDOB);
             }
         }

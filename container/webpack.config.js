@@ -28,7 +28,6 @@ module.exports = {
       remotes: {
         mfeHome: "mfeHome@http://localhost:3001/remoteEntry.js",
         mfeAnalytics: "mfeAnalytics@http://localhost:3002/remoteEntry.js",
-        mfeDataBus: "mfeDataBus@http://localhost:3004/remoteEntry.js",
       },
       shared: ["react", "react-dom"],
     }),

@@ -2,20 +2,20 @@ import React, { Suspense, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "../../mfe-tasks";
 import { Reports } from "@acme/mfe-reports";
+import DataBus from "./databus/DataBus.js";
+import DataBusAPI from "./databus/DataBusAPI.js";
 
 const Home = React.lazy(() => import("mfeHome/Home"));
 const Analytics = React.lazy(() => import("mfeAnalytics/Analytics"));
 
 function App() {
   const [dataBusReady, setDataBusReady] = useState(false);
-  const [dataBus, setDataBus] = useState(null);
   const [reportsData, setReportsData] = useState({});
 
   useEffect(() => {
     const initializeDataBus = async () => {
       try {
-        const DataBus = (await import("mfeDataBus/DataBus")).default;
-        
+        // Initialize local DataBus
         await DataBus.initialize(
           {
             name: "Santosh Singh",
@@ -25,9 +25,6 @@ function App() {
           './rules.json'
         );
         
-        setDataBus(DataBus);
-        setDataBusReady(true);
-        
         // Subscribe to reports data changes for NPM package
         DataBus.subscribe('mfe-reports', (data) => {
           setReportsData(data);
@@ -36,7 +33,11 @@ function App() {
         // Get initial reports data
         setReportsData(DataBus.getReportsData());
         
-        console.log('Container: DataBus initialized successfully');
+        // Make API ready for Web Components
+        DataBusAPI.setReady();
+        
+        setDataBusReady(true);
+        console.log('Container: Local DataBus initialized successfully');
       } catch (error) {
         console.error('Container: Failed to initialize DataBus:', error);
         setDataBusReady(false);
@@ -55,8 +56,8 @@ function App() {
   }, []);
 
   const handleReportsStateUpdate = (newState) => {
-    if (dataBus) {
-      dataBus.updateReportsData({ state: newState });
+    if (dataBusReady) {
+      DataBus.updateReportsData({ state: newState });
       console.log('Container: Updated reports state to:', newState);
     }
   };
